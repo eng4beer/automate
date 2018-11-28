@@ -1,0 +1,17 @@
+#### This is a simple bash script to check vdsm and hosted engine
+#### It will restart vdsm if there is an issue with hosted engine
+#### It's not great and I am sure there is a better way to do it, but it does work
+vdsm=$(hosted-engine --vm-status)
+status=$(hosted-engine --vm-status |grep state |cut -d "=" -f2)
+if [ "$vdsm" = 'The hosted engine configuration has not been retrieved from shared storage. Please ensure that ovirt-ha-agent is running and the storage server is reachable.' ]
+    then
+    echo "Please restart vdsmd"
+    systemctl restart vdsmd
+    else
+    if [ "$status" = "EngineUp" ]
+        then
+        echo "Engine is Up"
+        else
+        hosted-engine --vm-start
+    fi
+fi
